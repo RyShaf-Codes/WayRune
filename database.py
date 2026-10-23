@@ -52,6 +52,7 @@ def get_campaign(campaign_id):
     connection.close()
 
     return campaign
+
 def add_player(campaign_id, player_name, character_name, character_class, level, race):
     connection = get_connection()
     cursor = connection.cursor()
@@ -314,11 +315,78 @@ def update_note(note_id, note_title, note_category, note_content, note_visibilit
     cursor.close()
     connection.close()
 
+def get_user_by_id(user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT * FROM users
+        WHERE id = ?
+    """, (user_id,))
+
+    user = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return user
+
+def add_user(email, display_name, avatar_url=None):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+    INSERT INTO users (email, display_name, avatar_url)
+    VALUES (?, ?, ?)
+""", (email, display_name, avatar_url))
+
+    connection.commit()
+    user_id = cursor.lastrowid
+
+    cursor.close()
+    connection.close()
+
+    return user_id
+
+def get_auth_account(provider, provider_user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT * FROM auth_accounts
+        WHERE provider = ?
+        AND provider_user_id = ?
+    """, (provider, provider_user_id))
+
+    auth_account = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return auth_account
+
+def add_auth_account(user_id, provider, provider_user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+    INSERT INTO auth_accounts (user_id, provider, provider_user_id)
+    VALUES (?, ?, ?)
+""", (user_id, provider, provider_user_id))
+
+    connection.commit()
+    auth_account_id = cursor.lastrowid
+
+    cursor.close()
+    connection.close()
+
+    return auth_account_id
+
 def initialize_database():
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Campain creation
+    # Campaign creation
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS campaigns (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -387,6 +455,27 @@ def initialize_database():
         FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
         )
 
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL UNIQUE,
+        display_name TEXT NOT NULL,
+        avatar_url TEXT
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS auth_accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        provider TEXT NOT NULL,
+        provider_user_id TEXT NOT NULL,
+
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE (provider, provider_user_id)
+        )
     """)
 
     connection.commit()

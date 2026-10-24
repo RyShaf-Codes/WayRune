@@ -86,12 +86,14 @@ def google_callback():
 
 @app.route("/")
 def home():
-    campaigns = database.get_campaigns()
-
-    print("AUTHENTICATED:", current_user.is_authenticated)
-
     if current_user.is_authenticated:
+        campaigns = database.get_campaigns_for_user(current_user.id)
         print("CURRENT USER:", current_user.display_name)
+        print("CURRENT USER ID:", current_user.id)
+        print(database.get_campaigns())
+
+    else:
+        campaigns = []
 
     return render_template("index.html", campaigns=campaigns)
 
@@ -113,5 +115,18 @@ def campaign_page(campaign_id):
         )
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    from livereload import Server
 
+    app.debug = True
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+    server = Server(app.wsgi_app)
+
+    server.watch("templates/*.html")
+    server.watch("static/css/output.css")
+
+    server.serve(
+        host="localhost",
+        port=5000,
+        debug=True
+    )

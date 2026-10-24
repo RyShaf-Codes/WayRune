@@ -382,6 +382,42 @@ def add_auth_account(user_id, provider, provider_user_id):
 
     return auth_account_id
 
+def add_campaign_member(campaign_id, user_id, role):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+    INSERT INTO campaign_members (campaign_id, user_id, role)
+    VALUES (?, ?, ?)
+""", (campaign_id, user_id, role))
+
+    connection.commit()
+    campaign_member_id = cursor.lastrowid
+
+    cursor.close()
+    connection.close()
+
+    return campaign_member_id
+
+def get_campaigns_for_user(user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT campaigns.*, campaign_members.role
+        FROM campaigns
+        JOIN campaign_members
+        ON campaigns.id = campaign_members.campaign_id
+        WHERE campaign_members.user_id = ?
+        """, (user_id,))
+    campaigns = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return campaigns
+
+
 def initialize_database():
     connection = get_connection()
     cursor = connection.cursor()
@@ -478,6 +514,18 @@ def initialize_database():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS campaign_members (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        campaign_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        role TEXT NOT NULL,
+
+        FOREIGN KEY (campaign_id) REFERENCES campaigns(id),
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE (campaign_id, user_id)
+        )
+    """)
     connection.commit()
 
     cursor.close()

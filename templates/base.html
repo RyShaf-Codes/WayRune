@@ -8,6 +8,32 @@
 
 <body class="bg-slate-950 text-white">
 
+    {% if current_user.is_authenticated %}
+        <header class="sticky top-0 z-40 w-full bg-[#162456] shadow-md">
+            <div class="w-full px-6 flex justify-between items-center py-4">
+                <div class="flex gap-6 font-semibold items-center">
+                        <a href="{{ url_for('home') }}" class="text-3xl text-yellow-600">
+                            Wayrune
+                        </a>                       
+
+                        <a href="{{ url_for('home') }}" class="text-lg text-[#F1E8D8] hover:text-[#B88746] hover:underline underline-offset-4 decoration-2 transition">
+                            Home
+                        </a>
+
+                        <a href="{{ url_for('home') }}#campaigns" class = "text-lg text-[#F1E8D8] hover:text-[#B88746] hover:underline underline-offset-4 decoration-2 transition">
+                            Campaigns
+                        </a>
+                                    
+                </div>
+
+                <div class ="text-lg font-semibold">
+                    Hi, {{ current_user.display_name }}  |  <a href="{{ url_for('logout') }}"> Logout</a>
+                </div>
+            </div>
+
+        </header>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 

@@ -1,5 +1,5 @@
-from flask import Flask, render_template, url_for, redirect
-from flask_login import LoginManager, login_user, logout_user, current_user
+from flask import Flask, render_template, url_for, redirect, request, flash
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from authlib.integrations.flask_client import OAuth
 from user import User
 import database
@@ -98,7 +98,13 @@ def home():
     return render_template("index.html", campaigns=campaigns)
 
 @app.route("/campaign/<int:campaign_id>")
+@login_required
 def campaign_page(campaign_id):
+
+    if not database.is_campaign_member(campaign_id, current_user.id):
+        flash("You are not a member of that campaign.", "error")
+        return redirect(url_for("home"))
+        
     campaign = database.get_campaign(campaign_id)
     players = database.get_players(campaign_id)
     npcs = database.get_npcs(campaign_id)
@@ -113,6 +119,61 @@ def campaign_page(campaign_id):
         locations = locations,
         notes = notes
         )
+
+@app.route("/campaign/create", methods=["GET", "POST"])
+@login_required
+def create_campaign():
+    if request.method == "POST":
+        campaign_name = request.form["campaign_name"]
+        system = request.form["system"]
+        invite_code = database.generate_invite_code()
+        campaign_id = database.add_campaign(
+            campaign_name, 
+            current_user.display_name, 
+            system,
+            invite_code
+            )
+
+        database.add_campaign_member(
+            campaign_id, 
+            current_user.id, 
+            "DM"
+            )
+
+        return redirect(
+            url_for("campaign_page", campaign_id=campaign_id)
+        )
+
+    return render_template("create_campaign.html")
+
+@app.route("/campaign/join", methods=["GET", "POST"])
+@login_required
+def join_campaign():
+    if request.method == "POST":
+        invite_code = request.form["invite_code"]
+
+        campaign = database.get_campaign_by_invite_code(invite_code)
+
+        if campaign is None:
+            flash("Invalid invite code.", "error")
+            return redirect(url_for("join_campaign"))
+
+        if not database.is_campaign_member(campaign[0], current_user.id):
+            database.add_campaign_member(
+                campaign[0], 
+                current_user.id, 
+                "PLAYER"
+                )
+
+
+        return redirect(
+            url_for("campaign_page", campaign_id=campaign[0])
+        )
+
+    
+    return render_template("join_campaign.html")
+    
+
 
 if __name__ == "__main__":
     from livereload import Server

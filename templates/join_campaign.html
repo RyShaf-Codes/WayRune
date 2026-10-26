@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create a Campaign
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="text-4xl font-bold text-left mt-12">
+        Join a Campaign.
+    </h1>
+
+    <form method="POST">
+        <h2>
+            Enter the code for the campaign: <input name="invite_code">
+        </h2>
+
+        <button type="submit" class="cursor-pointer">
+            Join Campaign
+        </button>
+    </form>
+
+
+
+
+{% endblock %}

@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, secrets, string
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -9,14 +9,14 @@ def get_connection():
     connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
-def add_campaign(name, dm_name, system):
+def add_campaign(name, dm_name, system, invite_code):
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute("""
-    INSERT INTO campaigns (name, dm_name, system)
-    VALUES (?, ?, ?)
-""", (name, dm_name, system))
+    INSERT INTO campaigns (name, dm_name, system, invite_code)
+    VALUES (?, ?, ?, ?)
+""", (name, dm_name, system, invite_code))
 
     connection.commit()
     campaign_id = cursor.lastrowid
@@ -417,6 +417,51 @@ def get_campaigns_for_user(user_id):
 
     return campaigns
 
+def is_campaign_member(campaign_id, user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM campaign_members
+        WHERE campaign_id = ?
+        AND user_id = ?
+        """, (campaign_id, user_id))
+
+    membership = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    if membership is not None:
+        return True
+
+    else:
+        return False
+
+def get_campaign_by_invite_code(invite_code):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM campaigns
+        WHERE invite_code = ?
+        """, (invite_code,))
+
+    campaign = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return campaign
+
+
+
+
+def generate_invite_code():
+    invite_code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range (6))
+    return invite_code
 
 def initialize_database():
     connection = get_connection()
@@ -428,7 +473,8 @@ def initialize_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             dm_name TEXT NOT NULL,
-            system TEXT NOT NULL
+            system TEXT NOT NULL,
+            invite_code TEXT NULL
         )
     """)
 

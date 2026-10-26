@@ -8,18 +8,13 @@
       "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-amber-600: oklch(66.6% 0.179 58.318);
-    --color-amber-700: oklch(55.5% 0.163 48.998);
-    --color-yellow-400: oklch(85.2% 0.199 91.936);
-    --color-yellow-500: oklch(79.5% 0.184 86.047);
+    --color-red-700: oklch(50.5% 0.213 27.518);
     --color-yellow-600: oklch(68.1% 0.162 75.834);
-    --color-yellow-700: oklch(55.4% 0.135 66.442);
     --color-slate-400: oklch(70.4% 0.04 256.788);
     --color-slate-700: oklch(37.2% 0.044 257.287);
     --color-slate-800: oklch(27.9% 0.041 260.031);
     --color-slate-900: oklch(20.8% 0.042 265.755);
     --color-slate-950: oklch(12.9% 0.042 264.695);
-    --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
     --container-5xl: 64rem;
@@ -193,9 +188,6 @@
   }
 }
 @layer utilities {
-  .fixed {
-    position: fixed;
-  }
   .static {
     position: static;
   }
@@ -205,26 +197,8 @@
   .top-0 {
     top: 0px;
   }
-  .top-10 {
-    top: calc(var(--spacing) * 10);
-  }
-  .top-100 {
-    top: calc(var(--spacing) * 100);
-  }
-  .z-10 {
-    z-index: 10;
-  }
-  .z-30 {
-    z-index: 30;
-  }
   .z-40 {
     z-index: 40;
-  }
-  .z-50 {
-    z-index: 50;
-  }
-  .z-60 {
-    z-index: 60;
   }
   .mx-auto {
     margin-inline: auto;
@@ -238,14 +212,8 @@
   .mt-4 {
     margin-top: calc(var(--spacing) * 4);
   }
-  .mt-5 {
-    margin-top: calc(var(--spacing) * 5);
-  }
   .mt-6 {
     margin-top: calc(var(--spacing) * 6);
-  }
-  .mt-8 {
-    margin-top: calc(var(--spacing) * 8);
   }
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
@@ -268,6 +236,9 @@
   .max-w-5xl {
     max-width: var(--container-5xl);
   }
+  .cursor-pointer {
+    cursor: pointer;
+  }
   .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
@@ -282,9 +253,6 @@
   }
   .gap-6 {
     gap: calc(var(--spacing) * 6);
-  }
-  .self-center {
-    align-self: center;
   }
   .rounded-xl {
     border-radius: var(--radius-xl);
@@ -311,11 +279,8 @@
   .bg-\[\#B88746\] {
     background-color: #B88746;
   }
-  .bg-amber-700 {
-    background-color: var(--color-amber-700);
-  }
-  .bg-black {
-    background-color: var(--color-black);
+  .bg-red-700 {
+    background-color: var(--color-red-700);
   }
   .bg-slate-900 {
     background-color: var(--color-slate-900);
@@ -326,23 +291,14 @@
   .bg-transparent {
     background-color: transparent;
   }
-  .bg-white {
-    background-color: var(--color-white);
-  }
-  .bg-yellow-500 {
-    background-color: var(--color-yellow-500);
-  }
-  .bg-yellow-600 {
-    background-color: var(--color-yellow-600);
-  }
-  .bg-yellow-700 {
-    background-color: var(--color-yellow-700);
-  }
   .p-6 {
     padding: calc(var(--spacing) * 6);
   }
   .px-6 {
     padding-inline: calc(var(--spacing) * 6);
+  }
+  .py-3 {
+    padding-block: calc(var(--spacing) * 3);
   }
   .py-4 {
     padding-block: calc(var(--spacing) * 4);
@@ -352,9 +308,6 @@
   }
   .text-left {
     text-align: left;
-  }
-  .text-right {
-    text-align: right;
   }
   .text-2xl {
     font-size: var(--text-2xl);
@@ -400,14 +353,8 @@
   .text-white {
     color: var(--color-white);
   }
-  .text-yellow-400 {
-    color: var(--color-yellow-400);
-  }
   .text-yellow-600 {
     color: var(--color-yellow-600);
-  }
-  .underline {
-    text-decoration-line: underline;
   }
   .decoration-2 {
     text-decoration-thickness: 2px;
@@ -428,29 +375,14 @@
     .hover\:border-\[\#B88746\]:hover {
       border-color: #B88746;
     }
-    .hover\:bg-\[\#0D1B24\]:hover {
-      background-color: #0D1B24;
-    }
     .hover\:bg-\[\#112631\]:hover {
       background-color: #112631;
-    }
-    .hover\:bg-\[\#B88746\]:hover {
-      background-color: #B88746;
     }
     .hover\:bg-\[\#C79A58\]:hover {
       background-color: #C79A58;
     }
-    .hover\:bg-amber-600:hover {
-      background-color: var(--color-amber-600);
-    }
     .hover\:bg-slate-800:hover {
       background-color: var(--color-slate-800);
-    }
-    .hover\:bg-yellow-600:hover {
-      background-color: var(--color-yellow-600);
-    }
-    .hover\:bg-yellow-700:hover {
-      background-color: var(--color-yellow-700);
     }
     .hover\:text-\[\#B88746\]:hover {
       color: #B88746;

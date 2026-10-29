@@ -456,8 +456,91 @@ def get_campaign_by_invite_code(invite_code):
 
     return campaign
 
+def add_character(campaign_id, user_id, character_name, race, character_class, level, status):
+    connection = get_connection()
+    cursor = connection.cursor()
 
+    cursor.execute("""
+    INSERT INTO characters (campaign_id, user_id, character_name, race, character_class, level, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (campaign_id, user_id, character_name, race, character_class, level, status))
 
+    connection.commit()
+    character_id = cursor.lastrowid
+
+    cursor.close()
+    connection.close()
+
+    return character_id
+
+def get_characters_for_user(campaign_id, user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM characters
+        WHERE campaign_id = ?
+        AND user_id = ?
+        """, (campaign_id, user_id))
+
+    characters = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return characters
+
+def get_active_character(campaign_id, user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM characters
+        WHERE campaign_id = ?
+        AND user_id = ?
+        AND status = ?
+        """, (campaign_id, user_id, "ACTIVE"))
+    
+    character = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return character
+
+def update_character_status(character_id, status):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        UPDATE characters
+        SET status = ?
+        WHERE id = ?
+    """, (status, character_id))
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+def get_character(character_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM characters
+        WHERE id = ?
+    """, (character_id,))
+
+    character = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return character
 
 def generate_invite_code():
     invite_code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range (6))
@@ -570,6 +653,22 @@ def initialize_database():
         FOREIGN KEY (campaign_id) REFERENCES campaigns(id),
         FOREIGN KEY (user_id) REFERENCES users(id),
         UNIQUE (campaign_id, user_id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS characters (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        campaign_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        character_name TEXT NOT NULL,
+        race TEXT NOT NULL,
+        character_class TEXT NOT NULL,
+        level INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        
+        FOREIGN KEY (campaign_id) REFERENCES campaigns(id),
+        FOREIGN KEY (user_id) REFERENCES users(id)
         )
     """)
     connection.commit()
